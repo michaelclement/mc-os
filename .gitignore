@@ -1,1 +1,9 @@
+/* the /linux dir we copied in just as an easy syntax highlighting fix */
 /linux
+
+/* compiled module files */
+*.o
+*.ko
+*.cmd
+*mod*
+*symvers
