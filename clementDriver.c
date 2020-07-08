@@ -6,6 +6,9 @@
 #include <linux/fs.h>
 #include <linux/device.h>
 #include <linux/cdev.h>
+// For accessing userspace
+#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 /* ------------------------------------------------- */
 /*                       GLOBALS                     */
@@ -17,6 +20,8 @@ static dev_t first;
 static struct cdev c_dev;
 // device class
 static struct class *cl;
+// global character to be read/written 
+static char c;
 
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
@@ -36,23 +41,42 @@ static int my_close(struct inode *i, struct file *f)
 static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
    printk(KERN_INFO "Driver: read()\n");
-   return 0;
+   if (*off == 0) {
+      // copy one byte from c into buf, in user space.
+      // Return an error if all data isn't transferred
+      if (copy_to_user(buf, &c, 1) != 0) {
+         return -EFAULT;
+      } else {
+         // increment off so that we don't infinitely
+         // spit out the last character in the buffer
+         // when we read.
+         (*off)++;
+         return 1;
+      }
+   } else {
+      return 0;
+   }
 }
 
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len,
                         loff_t *off)
 {
    printk(KERN_INFO "Driver: write()\n");
-   return len;
+   // Write to 'c'
+   if (copy_from_user(&c, buf + len -1, 1) != 0) {
+      return -EFAULT;
+   } else {
+      return len;
+   }
 }
 
-static struct file_operations clem_fops =
-    {
-        .owner = THIS_MODULE,
-        .open = my_open,
-        .release = my_close,
-        .read = my_read,
-        .write = my_write};
+static struct file_operations clem_fops = {
+   .owner = THIS_MODULE,
+   .open = my_open,
+   .release = my_close,
+   .read = my_read,
+   .write = my_write
+};
 
 // Function to be called when the module is loaded
 static int __init clem_init(void)
@@ -100,7 +124,7 @@ static void __exit clem_exit(void) /* Destructor */
    device_destroy(cl, first);
    class_destroy(cl);
    unregister_chrdev_region(first, 1);
-   printk(KERN_INFO "\n-------\nCLEM DRIVER UNREGISTERED");
+   printk(KERN_INFO "\n--------\nCLEM DRIVER UNREGISTERED");
 };
 
 /* ------------------------------------------------- */
