@@ -18,10 +18,13 @@ Both of these were taken from examples on https://sysplay.in.
 - Read from it: `cat /dev/mynull` (should see the final 't' from our message)
 - Unload the module by running `sudo rmmod clementDriver.ko`
 
-## Flash Drive Driver (pen_register) 
+## Flash Drive Driver (pen_driver) 
 - `sudo rmmod usb-storage` to remove the main USB storage module so it won't
-intercept the Samsung drive when inserted
-- `sudo insmod pen_register.ko`
+intercept the Samsung drive when inserted (may need to reboot the computer
+with the USB drive disconnected if it's not working).
+- `sudo insmod pen_driver.ko`
 - plug in the flash drive
-- run `dmesg | tail -20` to check that it reacted to the drive plugging in
+- run `dmesg` to check that it reacted to the drive plugging in
+- Write to flash drive: `echo -n "test" > /dev/pen<MINOR NUMBER>`
+- Read (doesn't work yet): `cat /dev/pen<MINOR NUMBER>`
 - `sudo rmmod pen_register.ko` to remove module.
