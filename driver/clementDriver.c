@@ -30,19 +30,19 @@ static char c;
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
 
-static int my_open(struct inode *i, struct file *f)
+static int cd_open(struct inode *i, struct file *f)
 {
    printk(KERN_INFO "Driver: open()\n");
    return 0;
 }
 
-static int my_close(struct inode *i, struct file *f)
+static int cd_close(struct inode *i, struct file *f)
 {
    printk(KERN_INFO "Driver: close()\n");
    return 0;
 }
 
-static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
+static ssize_t cd_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
    printk(KERN_INFO "Driver: read()\n");
    if (*off == 0) {
@@ -62,7 +62,7 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
    }
 }
 
-static ssize_t my_write(struct file *f, const char __user *buf, size_t len,
+static ssize_t cd_write(struct file *f, const char __user *buf, size_t len,
                         loff_t *off)
 {
    printk(KERN_INFO "Driver: write()\n");
@@ -76,10 +76,10 @@ static ssize_t my_write(struct file *f, const char __user *buf, size_t len,
 
 static struct file_operations clem_fops = {
    .owner = THIS_MODULE,
-   .open = my_open,
-   .release = my_close,
-   .read = my_read,
-   .write = my_write
+   .open = cd_open,
+   .release = cd_close,
+   .read = cd_read,
+   .write = cd_write
 };
 
 // Function to be called when the module is loaded
@@ -102,7 +102,7 @@ static int __init clem_init(void)
       unregister_chrdev_region(first, 1);
       return PTR_ERR(cl);
    }
-   if (IS_ERR(dev_ret = device_create(cl, NULL, first, NULL, "mynull")))
+   if (IS_ERR(dev_ret = device_create(cl, NULL, first, NULL, "cdnull")))
    {
       class_destroy(cl);
       unregister_chrdev_region(first, 1);
