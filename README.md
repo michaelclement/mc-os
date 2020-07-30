@@ -21,6 +21,7 @@ interface application requires Python3.
 - At this point, sending a single char to the device will return the ROT13
   value of that character, i.e. `echo -n "a" > /dev/cdnull | cat /dev/cdnull` 
   (result will be 'n')
+- Running `dmesg` will show output from the module as it rotates characters.
 - When finished, run `make clean` to unload the module and remove the compiled
   files.
 
