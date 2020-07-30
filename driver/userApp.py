@@ -15,14 +15,17 @@ loads and works.
 
 import os
 
-def make():
+def make(mode=""):
     """
     Calls the make function to build
     and insert the device driver module.
     """
-    os.system('make')
-    print("Made.")
-
+    if mode == "clean":
+        os.system('make clean')
+        print("\nUnloaded and cleaned up character driver...")
+    else:
+        os.system('make')
+        print("\nMade and loaded character driver...")
 
 def invoke_kernel_module(string):
     """
@@ -69,3 +72,5 @@ if __name__=="__main__":
     make()
     # start the main loop
     send_chars()
+    # Clean up and unload module
+    make('clean')
