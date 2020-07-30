@@ -24,8 +24,10 @@ static dev_t first;
 static struct cdev c_dev;
 // device class
 static struct class *cl;
-// global character to be read/written 
+// global character to be read/written
 static char c;
+// global character to store the rotated value
+static char r;
 
 /* ------------------------------------------------- */
 /* ------------------------------------------------- */
@@ -45,19 +47,25 @@ static int cd_close(struct inode *i, struct file *f)
 static ssize_t cd_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
    printk(KERN_INFO "Driver: read()\n");
-   if (*off == 0) {
+   if (*off == 0)
+   {
       // copy one byte from c into buf, in user space.
       // Return an error if all data isn't transferred
-      if (copy_to_user(buf, &c, 1) != 0) {
+      if (copy_to_user(buf, &r, 1) != 0)
+      {
          return -EFAULT;
-      } else {
+      }
+      else
+      {
          // increment off so that we don't infinitely
          // spit out the last character in the buffer
          // when we read.
          (*off)++;
          return 1;
       }
-   } else {
+   }
+   else
+   {
       return 0;
    }
 }
@@ -65,22 +73,49 @@ static ssize_t cd_read(struct file *f, char __user *buf, size_t len, loff_t *off
 static ssize_t cd_write(struct file *f, const char __user *buf, size_t len,
                         loff_t *off)
 {
-   printk(KERN_INFO "Driver: write()\n");
-   // Write to 'c'
-   if (copy_from_user(&c, buf + len -1, 1) != 0) {
+
+   printk(KERN_INFO "*- Driver: write( %d )\n", c);
+
+   if (copy_from_user(&c, buf + len - 1, 1) != 0)
+   {
+      printk(KERN_INFO "Failed here.\n");
       return -EFAULT;
-   } else {
+   }
+   else
+   {
+      // Check if it's a lowercase value
+      if ((c <= 122) && (c >= 97))
+      {
+         printk(KERN_INFO "Lowercase received.");
+         // Write to 'c'
+         // save original char value to r
+         r = c;
+         // perform rotation
+         if (r > 109)
+         {
+            // wrap around
+            r = 97 + (12 - (122 - r));
+         }
+         else
+         {
+            // No wrap around
+            r = r + 13;
+         }
+         // log the rotation:
+         printk(KERN_INFO "C -> R: %d -> %d\n", c, r);
+         return len;
+      }
+      // return without rotating
       return len;
    }
 }
 
 static struct file_operations clem_fops = {
-   .owner = THIS_MODULE,
-   .open = cd_open,
-   .release = cd_close,
-   .read = cd_read,
-   .write = cd_write
-};
+    .owner = THIS_MODULE,
+    .open = cd_open,
+    .release = cd_close,
+    .read = cd_read,
+    .write = cd_write};
 
 // Function to be called when the module is loaded
 static int __init clem_init(void)
@@ -92,7 +127,7 @@ static int __init clem_init(void)
    // Print when we register the module
    printk(KERN_INFO "\n--------\nCLEM DRIVER REGISTERED");
 
-   // Register major number with name "clem"
+   // Register character device number with name "clem"
    if ((ret = alloc_chrdev_region(&first, 0, 1, "clem")) < 0)
    {
       return ret;
