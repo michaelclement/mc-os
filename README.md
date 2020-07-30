@@ -35,6 +35,14 @@ interface application requires Python3.
 - Press `ctrl+c` to quit. The python script will automatically run `make
 clean`.
 
+## Video Demo
+These videos demonstrate the module being loaded/interacted with, just
+as extra insurance in case there is an issue running them on a different
+machine.
+
+- Part 1: [Loading the module without python](https://youtu.be/lXsfKwv59wI)
+- Part 2: [Using the python script to interact with the module](https://youtu.be/Ghdz-IRwBS8)
+
 ## Resources
 Tutorial/documentation resources gleaned from:
 - https://linux-kernel-labs.github.io/
