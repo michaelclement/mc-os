@@ -31,8 +31,8 @@ interface application requires Python3.
   the kernel.
 - Sending a string of characters will return the ROT13 version, as processed
   by the kernel module.
-- Press `ctrl+c` to quit.
-- Run `make clean` to remove compiled files and unload the module.
+- Press `ctrl+c` to quit. The python script will automatically run `make
+clean`.
 
 ## Resources
 Tutorial/documentation resources gleaned from:
