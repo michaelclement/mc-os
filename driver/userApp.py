@@ -1,3 +1,18 @@
+"""
+Author: Michael Clement
+
+This program is an interactive prompt for sending
+characters to the character driver kernel module.
+
+The kernel module takes the characters and performs
+a simple ROT13 on them, returning the new value which
+is then displayed to the user.
+
+This is just meant to make it easy to interact with
+it and demonstrate that the kernel module actually
+loads and works.
+"""
+
 import os
 
 def make():
@@ -21,7 +36,7 @@ def invoke_kernel_module(string):
     rot_string = ""
     
     print(f"Sending {string} to kernel for rotation.")
-    for char in string:
+    for char in str.lower(string):
         cmd = f'echo -n "{char}" > /dev/cdnull | cat /dev/cdnull'
         stream = os.popen(cmd)
         rot_string += stream.read()
@@ -37,12 +52,17 @@ def send_chars():
     """
     loop = True
     while loop:
-        print("Enter a string to convert:")
-        user_string = input()
-        rot = invoke_kernel_module(user_string)
-        # Show the result
-        print("Rotated string: ", rot)
-        print()
+        try:
+            print("\n---- Press CTRL-C to quit ----")
+            print("  Enter a string to convert:  ")
+            user_string = input()
+            rot = invoke_kernel_module(user_string)
+            # Show the result
+            print("Rotated string: ", rot, "\n")
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            # Exit loop if they press ctrl-c
+            loop = False
 
 
 if __name__=="__main__":
