@@ -13,6 +13,14 @@ Linux kernel module character driver that performs ROT13 (from in the kernel).
 - When finished, run `make clean` to unload the module and remove the compiled
   files.
 
+## Using Python userApp.py for testing
+- run `python userApp.py` to start up the python script. This will run the 
+  makefile and insert the module into the kernel. Once the module is inserted,
+  the user will be prompted to send a string to the kernel.
+- Sending a string of characters will return the ROT13 version, as processed
+  by the kernel module.
+- Press `ctrl+c` to quit.
+
 ## Resources
 Tutorial/documentation resources gleaned from:
 - https://linux-kernel-labs.github.io/
